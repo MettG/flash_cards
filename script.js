@@ -1,11 +1,15 @@
 class FlashCard {
-	constructor(hint,info) {
+	constructor(hint,info,id) {
 		this.hin = hint;
 		this.inf = info;
 		this.hide = true;
+		this.i = id;
 	}
 	get hint() {
 		return this.hin;
+	}
+	get id(){
+		return `${this.i}`;
 	}
 	get info() {
 		return this.inf;
@@ -89,27 +93,34 @@ function update() {
 	// console.log(cards);
 	for(var i = 0; i < cards.length; i++) {
 		// console.log("looping...");
-		createCard(`${i}`, cards[i].hint, cards[i].info);
-
+		createCard(cards[i].id, cards[i].hint, cards[i].info);
 		if(cards[i].hiding) {
 			// console.log("Hint showing");
-			document.getElementById(`${i}i`).innerText = cards[i].hint;
-			document.getElementById(`${i}s`).innerText = "Show";
+			document.getElementById(cards[i].id + "i").innerText = cards[i].hint;
+			document.getElementById(cards[i].id + "s").innerText = "Show";
 		}
 		else {
 			// console.log("Info showing");
-			document.getElementById(`${i}i`).innerText = cards[i].info;
-			document.getElementById(`${i}s`).innerText = "Hide";
+			document.getElementById(cards[i].id + "i").innerText = cards[i].info;
+			document.getElementById(cards[i].id + "s").innerText = "Hide";
 		}
 	}
 }
 
+function find(arr, id) {
+	for(var i = 0; i < arr.length; i++) {
+		if(arr[i].id === id)
+			return arr[i];
+	}
+}
+
 let cards = [];
+const findCard = (id) => {return find(cards,id);};
 
-cards.push(new FlashCard("Arrow Functions", "Shorthand for function() {}, use () => {} instead."));
-cards.push(new FlashCard("Let", "Keyword that hoists the variable following."));
+cards.push(new FlashCard("Arrow Functions", "Shorthand for function() {}, use () => {} instead.", 0));
+cards.push(new FlashCard("Let", "Keyword that hoists the variable following.", 1));
 
-var timer = setInterval(update,500);
+var timer = setInterval(update,200);
 
 document.addEventListener('click', (e) => {
 	var c = e.target.getAttribute("class");
@@ -118,11 +129,11 @@ document.addEventListener('click', (e) => {
 	console.log(e.target.parentElement);
 	if(c === null) return;
 	if(c.includes("btn-large")) {
-			console.log("show button clicked");
-			// console.log(e.target.parentElement);
-			cards[id].swapHide();
+		// console.log(e.target.parentElement);
+		findCard(id).swapHide();
+		console.log(`Is hiding=${findCard(id).hiding}`);
 	} else if (c.includes("delete btn-small")){
-			console.log("Delete pressed");
+			console.log("Delete pressed" + id);
 			deleteCard(id);
 	} else if (c.includes("edit btn-small")){
 			console.log("Edit pressed");
@@ -131,14 +142,14 @@ document.addEventListener('click', (e) => {
 			document.getElementById(id+"i").className= "hide";
 	} else if (c.includes("save btn-small")){
 			console.log("Save pressed");
-			cards[id].hint = e.target.previousElementSibling.previousElementSibling.innerText;
-			cards[id].info = e.target.previousElementSibling.innerText;
+			findCard(id).hint = e.target.previousElementSibling.previousElementSibling.value;
+			findCard(id).info = e.target.previousElementSibling.value;
 			e.target.parentElement.className = "edit row hide";
 			document.getElementById(id+"i").className= "info";
 			e.target.parentElement.nextElementSibling.className = "show btn-large";
 	} else if (c.includes("new btn-small")){
 			console.log("New pressed");
-			cards.push(new FlashCard(e.target.previousElementSibling.previousElementSibling.innerText ,
-															 e.target.previousElementSibling.innerText));
+			cards.push(new FlashCard(e.target.previousElementSibling.previousElementSibling.value ,
+															 e.target.previousElementSibling.value, cards.length));
 	}
 });
