@@ -85,7 +85,8 @@ function createCard(id, hin, inf) {
 }
 function deleteCard(id) {
 	document.getElementById(id).remove();
-	cards.splice(id,1);
+	cards.splice(find(cards,id)[1],1);
+	console.log(cards);
 }
 
 function update() {
@@ -110,25 +111,28 @@ function update() {
 function find(arr, id) {
 	for(var i = 0; i < arr.length; i++) {
 		if(arr[i].id === id)
-			return arr[i];
+			return [arr[i],i];
 	}
 }
 
 let cards = [];
-const findCard = (id) => {return find(cards,id);};
+const findCard = (id) => {return find(cards,id)[0];};
 
 cards.push(new FlashCard("Arrow Functions", "Shorthand for function() {}, use () => {} instead.", 0));
 cards.push(new FlashCard("Let", "Keyword that hoists the variable following.", 1));
 
-var timer = setInterval(update,200);
+// var timer = setInterval(update,200);
 
 document.addEventListener('click', (e) => {
 	var c = e.target.getAttribute("class");
 	var id = e.target.parentElement.id;
 	console.log(e.target);
 	console.log(e.target.parentElement);
-	if(c === null) return;
-	if(c.includes("btn-large")) {
+	if(c === null) {
+		update();
+		return;
+	} 
+		if(c.includes("btn-large")) {
 		// console.log(e.target.parentElement);
 		findCard(id).swapHide();
 		console.log(`Is hiding=${findCard(id).hiding}`);
@@ -152,4 +156,5 @@ document.addEventListener('click', (e) => {
 			cards.push(new FlashCard(e.target.previousElementSibling.previousElementSibling.value ,
 															 e.target.previousElementSibling.value, cards.length));
 	}
+	update();
 });
